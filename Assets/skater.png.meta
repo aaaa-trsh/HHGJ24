@@ -44,7 +44,7 @@ TextureImporter:
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 1
+  spriteExtrude: 3
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -128,7 +128,7 @@ TextureImporter:
         serializedVersion: 2
         x: 124
         y: 256
-        width: 109
+        width: 112
         height: 143
       alignment: 9
       pivot: {x: 0.31063116, y: 0.002473771}
@@ -149,7 +149,7 @@ TextureImporter:
         serializedVersion: 2
         x: 235
         y: 245
-        width: 68
+        width: 75
         height: 154
       alignment: 9
       pivot: {x: 0.22551593, y: 0.0636774}
@@ -170,7 +170,7 @@ TextureImporter:
         serializedVersion: 2
         x: 312
         y: 255
-        width: 68
+        width: 72
         height: 144
       alignment: 9
       pivot: {x: 0.25457898, y: 0.0044039423}
@@ -191,7 +191,7 @@ TextureImporter:
         serializedVersion: 2
         x: 3
         y: 255
-        width: 116
+        width: 121
         height: 143
       alignment: 9
       pivot: {x: 0.3334166, y: 0.0040094135}
@@ -212,7 +212,7 @@ TextureImporter:
         serializedVersion: 2
         x: 385
         y: 254
-        width: 69
+        width: 76
         height: 144
       alignment: 9
       pivot: {x: 0.2581358, y: 0.0044039157}
@@ -233,7 +233,7 @@ TextureImporter:
         serializedVersion: 2
         x: 462
         y: 256
-        width: 91
+        width: 96
         height: 144
       alignment: 9
       pivot: {x: 0.3367065, y: 0.0025204485}
@@ -254,7 +254,7 @@ TextureImporter:
         serializedVersion: 2
         x: 79
         y: 101
-        width: 102
+        width: 105
         height: 135
       alignment: 9
       pivot: {x: 0.12275816, y: 0.26817808}

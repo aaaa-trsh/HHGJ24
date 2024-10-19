@@ -67,6 +67,15 @@ public class PlayerController : MonoBehaviour
     private float groundCheckCooldown;
     #endregion
 
+    #region Grind Check Variables
+    [Header("Grind Check")]
+    public Collider2D grindCollider;
+    public LayerMask grindLayer;
+    
+    private bool isGrinding = false;
+    private GameObject grindObject;
+    #endregion
+
     [Header("Movement")]
     public float pushForce = 4;
     public float ollieForce = 3;
@@ -93,7 +102,7 @@ public class PlayerController : MonoBehaviour
     [Header("Visuals")]
     public float rotationDamping = 20f;
 
-    void Awake()
+    void Start()
     {
         // initialize possible moves -- right now its just pushing left and right
         possibleMoves = new InputSequence[] {
@@ -116,10 +125,6 @@ public class PlayerController : MonoBehaviour
                 canDoMove = IsGrounded
             },
         };
-    }
-
-    void Start()
-    {
         rb = GetComponent<Rigidbody2D>();
         visualsAnimator = visuals.GetComponent<Animator>();
     }
@@ -147,9 +152,18 @@ public class PlayerController : MonoBehaviour
             if (rb.velocity.magnitude > 0.1f && Mathf.Abs(rb.velocity.x) > 0.1f)
             {
                 float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
-                if (rb.velocity.x < 0) { angle += 180; }
-                targetRotation = Quaternion.Euler(0, 0, angle);
-                visualsAnimator.SetFloat("Tilt", -(Mathf.Clamp(angle, -45, 45) - 45) / 90);
+                bool invert = rb.velocity.x < 0;
+                
+                if (invert) {
+                    angle = angle > 0 ? angle - 180 : angle + 180;
+                }
+
+                float tilt = ((Mathf.Clamp(angle, -45f, 45) + 45) / 90);
+                visualsAnimator.SetFloat("Tilt", invert ? tilt : 1 - tilt);
+                
+                targetRotation = Quaternion.Euler(0, 0, Mathf.Clamp(angle, -45f, 45f));
+            } else {
+                visualsAnimator.SetFloat("Tilt", 0);
             }
 
         }
@@ -179,27 +193,50 @@ public class PlayerController : MonoBehaviour
     // circle cast to get relevant info
     void CheckGround()
     {
-        if (groundCheckCooldown > 0)
+        var oldIsGrounded = groundedInfo.isGrounded;
+        
+        groundedInfo.angle = 0;
+        groundedInfo.distanceToGround = 0;
+        groundedInfo.surfaceNormal = Vector3.up;
+        groundedInfo.groundHitPosition = transform.position;
+        groundedInfo.floorObject = null;
+        groundedInfo.isGrounded = false;
+
+        
+        if (groundCheckCooldown <= 0)
         {
-            groundedInfo.isGrounded = false;
-            groundedInfo.angle = 0;
-            groundedInfo.distanceToGround = 0;
-            groundedInfo.surfaceNormal = Vector3.up;
-            groundedInfo.groundHitPosition = transform.position;
-            groundedInfo.floorObject = null;
-            return;
+            ContactFilter2D filter = new ContactFilter2D();
+            filter.useLayerMask = true;
+            filter.layerMask = groundLayer;
+            // filter.useNormalAngle = true;
+            // filter.minNormalAngle = -70;
+            // filter.maxNormalAngle = 70;
+
+            List<RaycastHit2D> hits = new List<RaycastHit2D>();
+            Vector3 groundCheckStart = transform.position + transform.TransformDirection(groundCheckOrigin);
+            int numHit = Physics2D.CircleCast(
+                groundCheckStart,
+                groundCheckRadius,
+                -transform.up,
+                filter,
+                hits,
+                groundCheckDistance
+            );
+
+            var dots = hits.Select(h => Vector2.Dot(h.point - (Vector2)groundCheckStart, transform.up));
+
+            if (numHit > 0 && dots.Min() <= 0)
+            {
+                var hit = hits[Array.IndexOf(dots.ToArray(), dots.Min())];
+                groundedInfo.isGrounded = true;
+                groundedInfo.angle = Vector3.Angle(hit.normal, transform.up);
+                groundedInfo.distanceToGround = hit.distance;
+                groundedInfo.surfaceNormal = hit.normal.normalized;
+                groundedInfo.groundHitPosition = hit.distance > 0 ? hit.point : transform.position;
+                groundedInfo.floorObject = hit.collider.gameObject;
+            }
         }
 
-        RaycastHit2D hit = Physics2D.CircleCast(
-            transform.position + transform.TransformDirection(groundCheckOrigin),
-            groundCheckRadius,
-            -transform.up,
-            groundCheckDistance,
-            groundLayer
-        );
-
-        var oldIsGrounded = groundedInfo.isGrounded;
-        groundedInfo.isGrounded = hit.collider != null;
         if (groundedInfo.isGrounded != oldIsGrounded)
         {
             if (groundedInfo.isGrounded)
@@ -211,12 +248,8 @@ public class PlayerController : MonoBehaviour
                 OnGroundExit();
             }
         }
-        groundedInfo.angle = Vector3.Angle(hit.normal, transform.up);
-        groundedInfo.distanceToGround = hit.distance;
-        groundedInfo.surfaceNormal = hit.normal.normalized;
-        groundedInfo.groundHitPosition = hit.distance > 0 ? hit.point : transform.position;
-        groundedInfo.floorObject = hit.collider != null ? hit.collider.gameObject : null;
     }
+
     bool IsGrounded() => groundedInfo.isGrounded;
 
     void OnGroundEnter()
