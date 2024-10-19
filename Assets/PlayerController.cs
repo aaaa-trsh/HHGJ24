@@ -44,6 +44,7 @@ class InputSequence
 public class PlayerController : MonoBehaviour
 {
     public Transform visuals;
+    private Animator visualsAnimator;
 
     #region Ground Check Variables
     [Header("Ground Check")]
@@ -69,9 +70,12 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float pushForce = 4;
     public float ollieForce = 3;
+    public float brakeDragFactor = .7f;
+    public float heavyFallFactor = 1.3f;
 
     #region Input Management Variables
     [Header("Input Management")]
+
     public float sequenceTimeoutDuration = 0.3f;        // how long a key must be pressed to maintain a sequence
 
     public float sequenceTimeout;
@@ -83,6 +87,7 @@ public class PlayerController : MonoBehaviour
         KeyCode.S,
         KeyCode.D
     };
+
     #endregion
 
     [Header("Visuals")]
@@ -94,13 +99,13 @@ public class PlayerController : MonoBehaviour
         possibleMoves = new InputSequence[] {
             new InputSequence {
                 name = "Push left",
-                sequence = new List<KeyCode> { KeyCode.S, KeyCode.A },
+                sequence = new List<KeyCode> { KeyCode.A, KeyCode.D },
                 doMove = PushLeft,
                 canDoMove = IsGrounded
             },
             new InputSequence {
                 name = "Push right",
-                sequence = new List<KeyCode> { KeyCode.S, KeyCode.D },
+                sequence = new List<KeyCode> { KeyCode.D, KeyCode.A },
                 doMove = PushRight,
                 canDoMove = IsGrounded
             },
@@ -116,6 +121,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        visualsAnimator = visuals.GetComponent<Animator>();
     }
 
 
@@ -143,11 +149,19 @@ public class PlayerController : MonoBehaviour
                 float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
                 if (rb.velocity.x < 0) { angle += 180; }
                 targetRotation = Quaternion.Euler(0, 0, angle);
+                visualsAnimator.SetFloat("Tilt", -(Mathf.Clamp(angle, -45, 45) - 45) / 90);
             }
+
+        }
+
+        if (Mathf.Abs(rb.velocity.x) > 0.1f)
+        {
+            visuals.localScale = new Vector3(-Mathf.Sign(rb.velocity.x), 1, 1);
         }
 
         visuals.rotation = Quaternion.RotateTowards(visuals.rotation, targetRotation, rotationDamping * 360 * Time.deltaTime);
     }
+
     void UpdateTimeouts()
     {
         var prevSequenceTimeout = sequenceTimeout;
@@ -184,7 +198,19 @@ public class PlayerController : MonoBehaviour
             groundLayer
         );
 
+        var oldIsGrounded = groundedInfo.isGrounded;
         groundedInfo.isGrounded = hit.collider != null;
+        if (groundedInfo.isGrounded != oldIsGrounded)
+        {
+            if (groundedInfo.isGrounded)
+            {
+                OnGroundEnter();
+            }
+            else
+            {
+                OnGroundExit();
+            }
+        }
         groundedInfo.angle = Vector3.Angle(hit.normal, transform.up);
         groundedInfo.distanceToGround = hit.distance;
         groundedInfo.surfaceNormal = hit.normal.normalized;
@@ -192,6 +218,16 @@ public class PlayerController : MonoBehaviour
         groundedInfo.floorObject = hit.collider != null ? hit.collider.gameObject : null;
     }
     bool IsGrounded() => groundedInfo.isGrounded;
+
+    void OnGroundEnter()
+    {
+        visualsAnimator.Play("Ground");
+    }
+
+    void OnGroundExit()
+    {
+        visualsAnimator.Play("Air");
+    }
 
     void OnCollisionExit2D(Collision2D collision)
     {
@@ -226,6 +262,8 @@ public class PlayerController : MonoBehaviour
         Vector2 projectedPushVector = pushVector - projection;
 
         rb.AddForce(projectedPushVector, ForceMode2D.Impulse);
+
+        visualsAnimator.Play("Push");
     }
 
     void Ollie()
@@ -266,6 +304,32 @@ public class PlayerController : MonoBehaviour
         if (didMove)
         {
             currentSequence.Clear();
+        }
+        else
+        {
+            if (IsGrounded())
+            {
+                if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+                {
+                    visualsAnimator.SetFloat("Brake", 1);
+
+                    Vector2 normal = groundedInfo.surfaceNormal;
+                    Vector2 projection = Vector2.Dot(rb.velocity, normal) * normal;
+                    rb.velocity -= brakeDragFactor * Time.deltaTime * projection;
+                }
+                else
+                {
+                    visualsAnimator.SetFloat("Brake", 0);
+                }
+            }
+            else
+            {
+                if (Input.GetKey(KeyCode.S))
+                {
+                    // accelerate downwards
+                    rb.AddForce(Vector2.down * heavyFallFactor, ForceMode2D.Force);
+                }
+            }
         }
     }
 
