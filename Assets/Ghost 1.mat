@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ghost
-  m_Shader: {fileID: -6465566751694194690, guid: 7735a1ac4204d4c45895623c5a247a3a, type: 3}
+  m_Name: Ghost 1
+  m_Shader: {fileID: 4800000, guid: d7ce154e756b0fc4688999eaeaba41a7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -70,11 +70,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Amplitude: 0.02
+    - PixelSnap: 0
+    - _Amplitude: 0.01
     - _EnableExternalAlpha: 0
-    - _Invert: 0
+    - _FlashAmount: 0.24
+    - _NoiseSnap: 0.1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _FlashColor: {r: 1, g: 0, b: 0, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _NoiseScale: {r: 0.01, g: 0.01, b: 0, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

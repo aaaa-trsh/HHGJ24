@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.VisualScripting;
 
 
 [Serializable]
@@ -44,6 +45,8 @@ class InputSequence
 public class PlayerController : MonoBehaviour
 {
     public Transform visuals;
+    public float cameraLookahead = 6;
+    public Transform cameraTarget;
     private Animator visualsAnimator;
 
     #region Ground Check Variables
@@ -71,7 +74,7 @@ public class PlayerController : MonoBehaviour
     [Header("Grind Check")]
     public Collider2D grindCollider;
     public LayerMask grindLayer;
-    
+
     private bool isGrinding = false;
     private GameObject grindObject;
     #endregion
@@ -81,6 +84,8 @@ public class PlayerController : MonoBehaviour
     public float ollieForce = 3;
     public float brakeDragFactor = .7f;
     public float heavyFallFactor = 1.3f;
+    public bool doingManual = false;
+
 
     #region Input Management Variables
     [Header("Input Management")]
@@ -97,6 +102,16 @@ public class PlayerController : MonoBehaviour
         KeyCode.D
     };
 
+    private static KeyCode FORWARDS_INPUT = (KeyCode)13;
+    private static KeyCode UP_FORWARDS_INPUT = (KeyCode)8;
+    private static KeyCode BACKWARDS_INPUT = (KeyCode)12;
+
+    private List<KeyCode> contextInputs = new List<KeyCode> {
+        FORWARDS_INPUT,
+        UP_FORWARDS_INPUT,
+        BACKWARDS_INPUT
+    };
+
     #endregion
 
     [Header("Visuals")]
@@ -107,13 +122,13 @@ public class PlayerController : MonoBehaviour
         // initialize possible moves -- right now its just pushing left and right
         possibleMoves = new InputSequence[] {
             new InputSequence {
-                name = "Push left",
+                name = "Push Left",
                 sequence = new List<KeyCode> { KeyCode.A, KeyCode.D },
                 doMove = PushLeft,
                 canDoMove = IsGrounded
             },
             new InputSequence {
-                name = "Push right",
+                name = "Push Right",
                 sequence = new List<KeyCode> { KeyCode.D, KeyCode.A },
                 doMove = PushRight,
                 canDoMove = IsGrounded
@@ -124,6 +139,12 @@ public class PlayerController : MonoBehaviour
                 doMove = Ollie,
                 canDoMove = IsGrounded
             },
+            new InputSequence {
+                name = "Kick Flip",
+                sequence = new List<KeyCode> { KeyCode.S, (KeyCode)UP_FORWARDS_INPUT },
+                doMove = Ollie,
+                canDoMove = IsGrounded
+            }
         };
         rb = GetComponent<Rigidbody2D>();
         visualsAnimator = visuals.GetComponent<Animator>();
@@ -135,8 +156,12 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         CheckKeys();
 
-        UpdateVisuals();
+        if (!IsGrounded() && rb.velocity.y < 0)
+        {
+            rb.AddForce(Vector2.down * heavyFallFactor, ForceMode2D.Force);
+        }
 
+        UpdateVisuals();
         UpdateTimeouts();
     }
 
@@ -149,33 +174,41 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (rb.velocity.magnitude > 0.1f && Mathf.Abs(rb.velocity.x) > 0.1f)
+            if (rb.velocity.magnitude > 0.1f && IsMoving())
             {
                 float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
                 bool invert = rb.velocity.x < 0;
-                
-                if (invert) {
+
+                if (invert)
+                {
                     angle = angle > 0 ? angle - 180 : angle + 180;
                 }
 
-                float tilt = ((Mathf.Clamp(angle, -45f, 45) + 45) / 90);
+                float tilt = (Mathf.Clamp(angle, -45f, 45) + 45) / 90;
                 visualsAnimator.SetFloat("Tilt", invert ? tilt : 1 - tilt);
-                
+
                 targetRotation = Quaternion.Euler(0, 0, Mathf.Clamp(angle, -45f, 45f));
-            } else {
+            }
+            else
+            {
                 visualsAnimator.SetFloat("Tilt", 0);
             }
 
         }
 
-        if (Mathf.Abs(rb.velocity.x) > 0.1f)
+        if (IsMoving())
         {
             visuals.localScale = new Vector3(-Mathf.Sign(rb.velocity.x), 1, 1);
+            cameraTarget.transform.localPosition = new Vector3(Mathf.Sign(rb.velocity.x) * cameraLookahead, 0, 0);
         }
+        visualsAnimator.SetBool("Manual", doingManual);
 
         visuals.rotation = Quaternion.RotateTowards(visuals.rotation, targetRotation, rotationDamping * 360 * Time.deltaTime);
     }
-
+    bool IsVisualsState(string state)
+    {
+        return visualsAnimator.GetCurrentAnimatorStateInfo(0).IsName(state);
+    }
     void UpdateTimeouts()
     {
         var prevSequenceTimeout = sequenceTimeout;
@@ -194,7 +227,7 @@ public class PlayerController : MonoBehaviour
     void CheckGround()
     {
         var oldIsGrounded = groundedInfo.isGrounded;
-        
+
         groundedInfo.angle = 0;
         groundedInfo.distanceToGround = 0;
         groundedInfo.surfaceNormal = Vector3.up;
@@ -202,15 +235,14 @@ public class PlayerController : MonoBehaviour
         groundedInfo.floorObject = null;
         groundedInfo.isGrounded = false;
 
-        
+
         if (groundCheckCooldown <= 0)
         {
-            ContactFilter2D filter = new ContactFilter2D();
-            filter.useLayerMask = true;
-            filter.layerMask = groundLayer;
-            // filter.useNormalAngle = true;
-            // filter.minNormalAngle = -70;
-            // filter.maxNormalAngle = 70;
+            ContactFilter2D filter = new ContactFilter2D
+            {
+                useLayerMask = true,
+                layerMask = groundLayer
+            };
 
             List<RaycastHit2D> hits = new List<RaycastHit2D>();
             Vector3 groundCheckStart = transform.position + transform.TransformDirection(groundCheckOrigin);
@@ -251,7 +283,7 @@ public class PlayerController : MonoBehaviour
     }
 
     bool IsGrounded() => groundedInfo.isGrounded;
-
+    bool IsMoving() => rb.velocity.magnitude > 0.1f;
     void OnGroundEnter()
     {
         visualsAnimator.Play("Ground");
@@ -283,10 +315,18 @@ public class PlayerController : MonoBehaviour
 
     #region Input Actions
 
-    void PushLeft() { Push(Vector2.left * pushForce); }
-    void PushRight() { Push(Vector2.right * pushForce); }
+    void PushLeft()
+    {
+        Push(Vector2.left * pushForce);
+        visualsAnimator.Play("Push");
+    }
+    void PushRight()
+    {
+        Push(Vector2.right * pushForce);
+        visualsAnimator.Play("Push");
+    }
 
-    void Push(Vector2 pushVector)
+    void Push(Vector2 pushVector, ForceMode2D forceMode = ForceMode2D.Impulse)
     {
         if (!IsGrounded()) return;
 
@@ -294,9 +334,7 @@ public class PlayerController : MonoBehaviour
         Vector2 projection = Vector2.Dot(pushVector, normal) * normal;
         Vector2 projectedPushVector = pushVector - projection;
 
-        rb.AddForce(projectedPushVector, ForceMode2D.Impulse);
-
-        visualsAnimator.Play("Push");
+        rb.AddForce(projectedPushVector, forceMode);
     }
 
     void Ollie()
@@ -311,7 +349,16 @@ public class PlayerController : MonoBehaviour
     {
         foreach (KeyCode key in keysToCheck)
         {
-            if (Input.GetKeyDown(key))
+            if (contextInputs.Contains(key))
+            {
+                if (Input.GetKey(key))
+                {
+                    currentSequence.Add(key);
+                    sequenceTimeout = sequenceTimeoutDuration;
+                    break;
+                }
+            }
+            else if (Input.GetKeyDown(key))
             {
                 currentSequence.Add(key);
                 sequenceTimeout = sequenceTimeoutDuration;
@@ -337,30 +384,48 @@ public class PlayerController : MonoBehaviour
         if (didMove)
         {
             currentSequence.Clear();
+            return;
         }
-        else
+
+
+
+        bool shouldManual = false;
+        // handle manual (s + backwards input)
+        if (IsGrounded())
         {
-            if (IsGrounded())
+            if (IsMoving())
+            {
+                var backwardsInput = Mathf.Sign(rb.velocity.x) < 0 ? Input.GetKey(KeyCode.D) : Input.GetKey(KeyCode.A);
+                // if (Vector2.Angle(groundedInfo.surfaceNormal, Vector2.up) < 20)
+                // {
+                shouldManual = backwardsInput && Input.GetKey(KeyCode.S);
+                // }
+            }
+
+            if (shouldManual != doingManual)
+            {
+                // on manual start
+                doingManual = shouldManual;
+            }
+        }
+
+        if (doingManual) { return; }
+
+        // handle braking (a || d input)
+        if (IsGrounded())
+        {
+            if (!doingManual)
             {
                 if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
                 {
                     visualsAnimator.SetFloat("Brake", 1);
-
-                    Vector2 normal = groundedInfo.surfaceNormal;
-                    Vector2 projection = Vector2.Dot(rb.velocity, normal) * normal;
-                    rb.velocity -= brakeDragFactor * Time.deltaTime * projection;
+                    // brake along perpendicular to the ground
+                    Vector2 brakeDirection = Vector2.Perpendicular(groundedInfo.surfaceNormal) * Mathf.Sign(rb.velocity.x);
+                    rb.AddForce(brakeDirection * brakeDragFactor, ForceMode2D.Force);
                 }
                 else
                 {
                     visualsAnimator.SetFloat("Brake", 0);
-                }
-            }
-            else
-            {
-                if (Input.GetKey(KeyCode.S))
-                {
-                    // accelerate downwards
-                    rb.AddForce(Vector2.down * heavyFallFactor, ForceMode2D.Force);
                 }
             }
         }
