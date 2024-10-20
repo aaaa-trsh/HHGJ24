@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.VisualScripting;
 
 
 [Serializable]
@@ -33,7 +34,7 @@ class GroundedInfo
 }
 
 [Serializable]
-class InputSequence
+public class InputSequence
 {
     public string name;
     public List<KeyCode> sequence;
@@ -44,6 +45,9 @@ class InputSequence
 public class PlayerController : MonoBehaviour
 {
     public Transform visuals;
+    public float cameraLookahead = 6;
+    public Transform cameraTarget;
+    private Animator visualsAnimator;
 
     #region Ground Check Variables
     [Header("Ground Check")]
@@ -66,12 +70,30 @@ public class PlayerController : MonoBehaviour
     private float groundCheckCooldown;
     #endregion
 
+    #region Grind Check Variables
+    [Header("Grind Check")]
+    public Collider2D grindCollider;
+    public LayerMask grindLayer;
+
+    private bool isGrinding = false;
+    private GameObject grindObject;
+    #endregion
+
+    [Header("Nose Grab")]
+    public Collider2D noseGrabCollider;
+    private bool isNoseGrabbing = false;
+
     [Header("Movement")]
     public float pushForce = 4;
     public float ollieForce = 3;
+    public float brakeDragFactor = .7f;
+    public float heavyFallFactor = 1.3f;
+    public bool doingManual = false;
+
 
     #region Input Management Variables
     [Header("Input Management")]
+
     public float sequenceTimeoutDuration = 0.3f;        // how long a key must be pressed to maintain a sequence
 
     public float sequenceTimeout;
@@ -83,24 +105,35 @@ public class PlayerController : MonoBehaviour
         KeyCode.S,
         KeyCode.D
     };
+
+    private static KeyCode FORWARDS_INPUT = (KeyCode)13;
+    private static KeyCode UP_FORWARDS_INPUT = (KeyCode)8;
+    private static KeyCode BACKWARDS_INPUT = (KeyCode)12;
+
+    private List<KeyCode> contextInputs = new List<KeyCode> {
+        FORWARDS_INPUT,
+        UP_FORWARDS_INPUT,
+        BACKWARDS_INPUT
+    };
+
     #endregion
 
     [Header("Visuals")]
     public float rotationDamping = 20f;
 
-    void Awake()
+    void Start()
     {
         // initialize possible moves -- right now its just pushing left and right
         possibleMoves = new InputSequence[] {
             new InputSequence {
-                name = "Push left",
-                sequence = new List<KeyCode> { KeyCode.S, KeyCode.A },
+                name = "Push Left",
+                sequence = new List<KeyCode> { KeyCode.A, KeyCode.D },
                 doMove = PushLeft,
                 canDoMove = IsGrounded
             },
             new InputSequence {
-                name = "Push right",
-                sequence = new List<KeyCode> { KeyCode.S, KeyCode.D },
+                name = "Push Right",
+                sequence = new List<KeyCode> { KeyCode.D, KeyCode.A },
                 doMove = PushRight,
                 canDoMove = IsGrounded
             },
@@ -110,12 +143,15 @@ public class PlayerController : MonoBehaviour
                 doMove = Ollie,
                 canDoMove = IsGrounded
             },
+            new InputSequence {
+                name = "Kick Flip",
+                sequence = new List<KeyCode> { KeyCode.S, (KeyCode)UP_FORWARDS_INPUT },
+                doMove = Ollie,
+                canDoMove = IsGrounded
+            }
         };
-    }
-
-    void Start()
-    {
         rb = GetComponent<Rigidbody2D>();
+        visualsAnimator = visuals.GetComponent<Animator>();
     }
 
 
@@ -124,8 +160,14 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         CheckKeys();
 
-        UpdateVisuals();
+        if (!IsGrounded() && rb.velocity.y < 0)
+        {
+            rb.AddForce(Vector2.down * heavyFallFactor, ForceMode2D.Force);
+        }
 
+        noseGrabCollider.enabled = isNoseGrabbing;
+
+        UpdateVisuals();
         UpdateTimeouts();
     }
 
@@ -138,15 +180,41 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (rb.velocity.magnitude > 0.1f && Mathf.Abs(rb.velocity.x) > 0.1f)
+            if (rb.velocity.magnitude > 0.1f && IsMoving() && !isNoseGrabbing)
             {
                 float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
-                if (rb.velocity.x < 0) { angle += 180; }
-                targetRotation = Quaternion.Euler(0, 0, angle);
+                bool invert = rb.velocity.x < 0;
+
+                if (invert)
+                {
+                    angle = angle > 0 ? angle - 180 : angle + 180;
+                }
+
+                float tilt = (Mathf.Clamp(angle, -45f, 45) + 45) / 90;
+                visualsAnimator.SetFloat("Tilt", invert ? tilt : 1 - tilt);
+
+                targetRotation = Quaternion.Euler(0, 0, Mathf.Clamp(angle, -45f, 45f));
             }
+            else
+            {
+                visualsAnimator.SetFloat("Tilt", 0);
+                targetRotation = Quaternion.Euler(0, 0, 0);
+            }
+
         }
 
+        if (IsMoving())
+        {
+            visuals.localScale = new Vector3(-Mathf.Sign(rb.velocity.x), 1, 1);
+            cameraTarget.transform.localPosition = new Vector3(Mathf.Sign(rb.velocity.x) * cameraLookahead, 0, 0);
+        }
+        visualsAnimator.SetBool("Manual", doingManual);
+
         visuals.rotation = Quaternion.RotateTowards(visuals.rotation, targetRotation, rotationDamping * 360 * Time.deltaTime);
+    }
+    bool IsVisualsState(string state)
+    {
+        return visualsAnimator.GetCurrentAnimatorStateInfo(0).IsName(state);
     }
     void UpdateTimeouts()
     {
@@ -165,33 +233,74 @@ public class PlayerController : MonoBehaviour
     // circle cast to get relevant info
     void CheckGround()
     {
-        if (groundCheckCooldown > 0)
+        var oldIsGrounded = groundedInfo.isGrounded;
+
+        groundedInfo.angle = 0;
+        groundedInfo.distanceToGround = 0;
+        groundedInfo.surfaceNormal = Vector3.up;
+        groundedInfo.groundHitPosition = transform.position;
+        groundedInfo.floorObject = null;
+        groundedInfo.isGrounded = false;
+
+
+        if (groundCheckCooldown <= 0)
         {
-            groundedInfo.isGrounded = false;
-            groundedInfo.angle = 0;
-            groundedInfo.distanceToGround = 0;
-            groundedInfo.surfaceNormal = Vector3.up;
-            groundedInfo.groundHitPosition = transform.position;
-            groundedInfo.floorObject = null;
-            return;
+            ContactFilter2D filter = new ContactFilter2D
+            {
+                useLayerMask = true,
+                layerMask = groundLayer
+            };
+
+            List<RaycastHit2D> hits = new List<RaycastHit2D>();
+            Vector3 groundCheckStart = transform.position + transform.TransformDirection(groundCheckOrigin);
+            int numHit = Physics2D.CircleCast(
+                groundCheckStart,
+                groundCheckRadius,
+                -transform.up,
+                filter,
+                hits,
+                groundCheckDistance
+            );
+
+            var dots = hits.Select(h => Vector2.Dot(h.point - (Vector2)groundCheckStart, transform.up));
+
+            if (numHit > 0 && dots.Min() <= 0)
+            {
+                var hit = hits[Array.IndexOf(dots.ToArray(), dots.Min())];
+                groundedInfo.isGrounded = true;
+                groundedInfo.angle = Vector3.Angle(hit.normal, transform.up);
+                groundedInfo.distanceToGround = hit.distance;
+                groundedInfo.surfaceNormal = hit.normal.normalized;
+                groundedInfo.groundHitPosition = hit.distance > 0 ? hit.point : transform.position;
+                groundedInfo.floorObject = hit.collider.gameObject;
+            }
         }
 
-        RaycastHit2D hit = Physics2D.CircleCast(
-            transform.position + transform.TransformDirection(groundCheckOrigin),
-            groundCheckRadius,
-            -transform.up,
-            groundCheckDistance,
-            groundLayer
-        );
-
-        groundedInfo.isGrounded = hit.collider != null;
-        groundedInfo.angle = Vector3.Angle(hit.normal, transform.up);
-        groundedInfo.distanceToGround = hit.distance;
-        groundedInfo.surfaceNormal = hit.normal.normalized;
-        groundedInfo.groundHitPosition = hit.distance > 0 ? hit.point : transform.position;
-        groundedInfo.floorObject = hit.collider != null ? hit.collider.gameObject : null;
+        if (groundedInfo.isGrounded != oldIsGrounded)
+        {
+            if (groundedInfo.isGrounded)
+            {
+                OnGroundEnter();
+            }
+            else
+            {
+                OnGroundExit();
+            }
+        }
     }
+
     bool IsGrounded() => groundedInfo.isGrounded;
+    bool IsMoving() => rb.velocity.magnitude > 0.1f;
+    void OnGroundEnter()
+    {
+        isNoseGrabbing = false;
+        visualsAnimator.Play("Ground");
+    }
+
+    void OnGroundExit()
+    {
+        visualsAnimator.Play("Air");
+    }
 
     void OnCollisionExit2D(Collision2D collision)
     {
@@ -214,10 +323,18 @@ public class PlayerController : MonoBehaviour
 
     #region Input Actions
 
-    void PushLeft() { Push(Vector2.left * pushForce); }
-    void PushRight() { Push(Vector2.right * pushForce); }
+    void PushLeft()
+    {
+        Push(Vector2.left * pushForce);
+        visualsAnimator.Play("Push", 0, 0);
+    }
+    void PushRight()
+    {
+        Push(Vector2.right * pushForce);
+        visualsAnimator.Play("Push", 0, 0);
+    }
 
-    void Push(Vector2 pushVector)
+    void Push(Vector2 pushVector, ForceMode2D forceMode = ForceMode2D.Impulse)
     {
         if (!IsGrounded()) return;
 
@@ -225,7 +342,7 @@ public class PlayerController : MonoBehaviour
         Vector2 projection = Vector2.Dot(pushVector, normal) * normal;
         Vector2 projectedPushVector = pushVector - projection;
 
-        rb.AddForce(projectedPushVector, ForceMode2D.Impulse);
+        rb.AddForce(projectedPushVector, forceMode);
     }
 
     void Ollie()
@@ -240,7 +357,16 @@ public class PlayerController : MonoBehaviour
     {
         foreach (KeyCode key in keysToCheck)
         {
-            if (Input.GetKeyDown(key))
+            if (contextInputs.Contains(key))
+            {
+                if (Input.GetKey(key))
+                {
+                    currentSequence.Add(key);
+                    sequenceTimeout = sequenceTimeoutDuration;
+                    break;
+                }
+            }
+            else if (Input.GetKeyDown(key))
             {
                 currentSequence.Add(key);
                 sequenceTimeout = sequenceTimeoutDuration;
@@ -266,6 +392,55 @@ public class PlayerController : MonoBehaviour
         if (didMove)
         {
             currentSequence.Clear();
+            return;
+        }
+
+
+        if (!IsGrounded() && Input.GetKeyDown(KeyCode.S))
+        {
+            visualsAnimator.Play("NoseGrab", 0, 0);
+            isNoseGrabbing = true;
+        }
+
+        bool shouldManual = false;
+        // handle manual (s + backwards input)
+        if (IsGrounded())
+        {
+            if (IsMoving())
+            {
+                var backwardsInput = Mathf.Sign(rb.velocity.x) < 0 ? Input.GetKey(KeyCode.D) : Input.GetKey(KeyCode.A);
+                // if (Vector2.Angle(groundedInfo.surfaceNormal, Vector2.up) < 20)
+                // {
+                shouldManual = backwardsInput && Input.GetKey(KeyCode.S);
+                // }
+            }
+
+            if (shouldManual != doingManual)
+            {
+                // on manual start
+                doingManual = shouldManual;
+            }
+        }
+
+        if (doingManual) { return; }
+
+        // handle braking (a || d input)
+        if (IsGrounded())
+        {
+            if (!doingManual)
+            {
+                if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) && IsMoving())
+                {
+                    visualsAnimator.SetFloat("Brake", 1);
+                    // brake along perpendicular to the ground
+                    Vector2 brakeDirection = Vector2.Perpendicular(groundedInfo.surfaceNormal) * Mathf.Sign(rb.velocity.x);
+                    rb.AddForce(brakeDirection * brakeDragFactor, ForceMode2D.Force);
+                }
+                else
+                {
+                    visualsAnimator.SetFloat("Brake", 0);
+                }
+            }
         }
     }
 

@@ -1,0 +1,536 @@
+fileFormatVersion: 2
+guid: aec8138156850044083698854efa9dd3
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 3
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 50
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: skater_0
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 256
+        width: 112
+        height: 143
+      alignment: 9
+      pivot: {x: 0.31063116, y: 0.002473771}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6ed73654f7e3f045be625fc4a54bcf1
+      internalID: -2086965237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_1
+      rect:
+        serializedVersion: 2
+        x: 235
+        y: 245
+        width: 75
+        height: 154
+      alignment: 9
+      pivot: {x: 0.22551593, y: 0.0636774}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8015d1196ac8b254abd56a10a941717e
+      internalID: -758283834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_2
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 255
+        width: 72
+        height: 144
+      alignment: 9
+      pivot: {x: 0.25457898, y: 0.0044039423}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7adb6c89e3156964aa2cfed184ff961a
+      internalID: 1204797671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_3
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 255
+        width: 121
+        height: 143
+      alignment: 9
+      pivot: {x: 0.3334166, y: 0.0040094135}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 931744a96b285c845b14f25c8099cc73
+      internalID: 94632338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_4
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 254
+        width: 76
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2581358, y: 0.0044039157}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb42b02215e776c4b850927bd7c4a73f
+      internalID: -1827288835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_5
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 256
+        width: 96
+        height: 144
+      alignment: 9
+      pivot: {x: 0.3367065, y: 0.0025204485}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 927ed48579af95647b2d9e949503ea2b
+      internalID: -1014392560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_6
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 101
+        width: 105
+        height: 135
+      alignment: 9
+      pivot: {x: 0.12275816, y: 0.26817808}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0d0dea8891021843938f99a9a2b9901
+      internalID: -1183691279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_7
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 91
+        width: 75
+        height: 142
+      alignment: 9
+      pivot: {x: 0.20813233, y: 0.04355514}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc216962c1b55bf4f8d9ff03bad65544
+      internalID: -1510234297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_9
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 90
+        width: 70
+        height: 144
+      alignment: 9
+      pivot: {x: 0.23126046, y: 0.023767153}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01c40e78f5a58bb43a73e75243f8cb31
+      internalID: -2111911980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_10
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 92
+        width: 102
+        height: 143
+      alignment: 9
+      pivot: {x: 0.4178455, y: 0.05870611}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fef92daeb0e6b11408b22c79dcc1ce97
+      internalID: -2140661595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ng1
+      rect:
+        serializedVersion: 2
+        x: 591
+        y: 245
+        width: 108
+        height: 131
+      alignment: 9
+      pivot: {x: 0.21739765, y: 0.2514823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93221161351dc594398a93c3497cb681
+      internalID: -654383011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ng2
+      rect:
+        serializedVersion: 2
+        x: 707
+        y: 241
+        width: 108
+        height: 131
+      alignment: 9
+      pivot: {x: 0.18285738, y: 0.25407094}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e78e3f819516f4047bf31855b7dd662b
+      internalID: 435457871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_12
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 89
+        width: 68
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 366c8bcaad110bb49aa5d5e19ca8d3b2
+      internalID: -2132285031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_8
+      rect:
+        serializedVersion: 2
+        x: 580
+        y: 181
+        width: 108
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fa8057d15a245f43bb14db309fd4ed5
+      internalID: -855953541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_11
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 136
+        width: 111
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3043da46243ff34985a4712cfaf8d76
+      internalID: -1163461751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_13
+      rect:
+        serializedVersion: 2
+        x: 760
+        y: 72
+        width: 49
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad3210c7a4ba37446b4ab86382ee11fb
+      internalID: -510356642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_14
+      rect:
+        serializedVersion: 2
+        x: 820
+        y: 68
+        width: 54
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4064e6aa2b2e264459efa07273788a4f
+      internalID: -933223640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_15
+      rect:
+        serializedVersion: 2
+        x: 882
+        y: 66
+        width: 50
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59a996019d28e0b44b937af9cf037c4b
+      internalID: 1006124304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      ng1: -1627296438
+      ng2: 435457871
+      skater_0: -2086965237
+      skater_1: -758283834
+      skater_10: -2140661595
+      skater_11: -1163461751
+      skater_12: -2132285031
+      skater_13: -510356642
+      skater_14: -933223640
+      skater_15: 1006124304
+      skater_2: 1204797671
+      skater_3: 94632338
+      skater_4: -1827288835
+      skater_5: -1014392560
+      skater_6: -1183691279
+      skater_7: -1510234297
+      skater_8: -855953541
+      skater_9: -2111911980
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
