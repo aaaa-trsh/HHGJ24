@@ -332,6 +332,174 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ng1
+      rect:
+        serializedVersion: 2
+        x: 591
+        y: 245
+        width: 108
+        height: 131
+      alignment: 9
+      pivot: {x: 0.21739765, y: 0.2514823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93221161351dc594398a93c3497cb681
+      internalID: -654383011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ng2
+      rect:
+        serializedVersion: 2
+        x: 707
+        y: 241
+        width: 108
+        height: 131
+      alignment: 9
+      pivot: {x: 0.18285738, y: 0.25407094}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e78e3f819516f4047bf31855b7dd662b
+      internalID: 435457871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_12
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 89
+        width: 68
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 366c8bcaad110bb49aa5d5e19ca8d3b2
+      internalID: -2132285031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_8
+      rect:
+        serializedVersion: 2
+        x: 580
+        y: 181
+        width: 108
+        height: 45
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fa8057d15a245f43bb14db309fd4ed5
+      internalID: -855953541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_11
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 136
+        width: 111
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3043da46243ff34985a4712cfaf8d76
+      internalID: -1163461751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_13
+      rect:
+        serializedVersion: 2
+        x: 760
+        y: 72
+        width: 49
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad3210c7a4ba37446b4ab86382ee11fb
+      internalID: -510356642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_14
+      rect:
+        serializedVersion: 2
+        x: 820
+        y: 68
+        width: 54
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4064e6aa2b2e264459efa07273788a4f
+      internalID: -933223640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: skater_15
+      rect:
+        serializedVersion: 2
+        x: 882
+        y: 66
+        width: 50
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59a996019d28e0b44b937af9cf037c4b
+      internalID: 1006124304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -343,16 +511,23 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      ng1: -1627296438
+      ng2: 435457871
       skater_0: -2086965237
       skater_1: -758283834
       skater_10: -2140661595
+      skater_11: -1163461751
+      skater_12: -2132285031
+      skater_13: -510356642
+      skater_14: -933223640
+      skater_15: 1006124304
       skater_2: 1204797671
       skater_3: 94632338
       skater_4: -1827288835
       skater_5: -1014392560
       skater_6: -1183691279
       skater_7: -1510234297
-      skater_8: -1627296438
+      skater_8: -855953541
       skater_9: -2111911980
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

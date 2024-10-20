@@ -34,7 +34,7 @@ class GroundedInfo
 }
 
 [Serializable]
-class InputSequence
+public class InputSequence
 {
     public string name;
     public List<KeyCode> sequence;
@@ -78,6 +78,10 @@ public class PlayerController : MonoBehaviour
     private bool isGrinding = false;
     private GameObject grindObject;
     #endregion
+
+    [Header("Nose Grab")]
+    public Collider2D noseGrabCollider;
+    private bool isNoseGrabbing = false;
 
     [Header("Movement")]
     public float pushForce = 4;
@@ -161,6 +165,8 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector2.down * heavyFallFactor, ForceMode2D.Force);
         }
 
+        noseGrabCollider.enabled = isNoseGrabbing;
+
         UpdateVisuals();
         UpdateTimeouts();
     }
@@ -174,7 +180,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (rb.velocity.magnitude > 0.1f && IsMoving())
+            if (rb.velocity.magnitude > 0.1f && IsMoving() && !isNoseGrabbing)
             {
                 float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
                 bool invert = rb.velocity.x < 0;
@@ -192,6 +198,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 visualsAnimator.SetFloat("Tilt", 0);
+                targetRotation = Quaternion.Euler(0, 0, 0);
             }
 
         }
@@ -286,6 +293,7 @@ public class PlayerController : MonoBehaviour
     bool IsMoving() => rb.velocity.magnitude > 0.1f;
     void OnGroundEnter()
     {
+        isNoseGrabbing = false;
         visualsAnimator.Play("Ground");
     }
 
@@ -318,12 +326,12 @@ public class PlayerController : MonoBehaviour
     void PushLeft()
     {
         Push(Vector2.left * pushForce);
-        visualsAnimator.Play("Push");
+        visualsAnimator.Play("Push", 0, 0);
     }
     void PushRight()
     {
         Push(Vector2.right * pushForce);
-        visualsAnimator.Play("Push");
+        visualsAnimator.Play("Push", 0, 0);
     }
 
     void Push(Vector2 pushVector, ForceMode2D forceMode = ForceMode2D.Impulse)
@@ -388,6 +396,11 @@ public class PlayerController : MonoBehaviour
         }
 
 
+        if (!IsGrounded() && Input.GetKeyDown(KeyCode.S))
+        {
+            visualsAnimator.Play("NoseGrab", 0, 0);
+            isNoseGrabbing = true;
+        }
 
         bool shouldManual = false;
         // handle manual (s + backwards input)
@@ -416,7 +429,7 @@ public class PlayerController : MonoBehaviour
         {
             if (!doingManual)
             {
-                if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+                if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) && IsMoving())
                 {
                     visualsAnimator.SetFloat("Brake", 1);
                     // brake along perpendicular to the ground

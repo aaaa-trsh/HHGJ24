@@ -530,7 +530,7 @@ GameObject:
   - component: {fileID: 5989928615481445263}
   m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -579,9 +579,10 @@ MonoBehaviour:
   grindLayer:
     serializedVersion: 2
     m_Bits: 0
-  pushForce: 8
-  ollieForce: 5
-  brakeDragFactor: 1
+  noseGrabCollider: {fileID: 0}
+  pushForce: 9.91
+  ollieForce: 6
+  brakeDragFactor: 3
   heavyFallFactor: 6
   doingManual: 0
   sequenceTimeoutDuration: 0.3
